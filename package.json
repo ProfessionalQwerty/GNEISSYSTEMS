@@ -1,0 +1,36 @@
+{
+  "name": "gneiss-cli",
+  "version": "1.0.0",
+  "description": "GNEISS CLI - Local structural analysis tool for Java projects",
+  "main": "dist/index.js",
+  "bin": {
+    "gneiss": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "structural-analysis",
+    "java",
+    "dependency-graph",
+    "cli"
+  ],
+  "author": "GNEISS",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "chalk": "^4.1.2",
+    "commander": "^11.0.0",
+    "ora": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
