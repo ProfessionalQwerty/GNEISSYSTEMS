@@ -5,7 +5,7 @@ import axios from 'axios';
 import * as crypto from 'crypto';
 
 const TOKEN_FILE = path.join(os.homedir(), '.gneiss', 'auth.json');
-const API_BASE_URL = process.env.GNEISS_API_URL || 'https://gneiss-platform.vercel.app';
+const API_BASE_URL = process.env.GNEISS_API_URL || 'https://gneiss-systems.vercel.app';
 const ENCRYPTION_KEY = process.env.GNEISS_ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
 
 interface AuthData {
@@ -17,7 +17,7 @@ interface AuthData {
 
 export async function initiateGitHubAuth(): Promise<string> {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/v1/auth/github/cli`, {
+    const response = await axios.get(`${API_BASE_URL}/api/cli/auth`, {
       timeout: 10000 // 10 second timeout
     });
     
@@ -45,7 +45,7 @@ export async function exchangeCodeForToken(code: string): Promise<string> {
   }
 
   try {
-    const response = await axios.post(`${API_BASE_URL}/api/v1/auth/github/exchange`, {
+    const response = await axios.post(`${API_BASE_URL}/api/cli/exchange`, {
       code: code.trim()
     }, {
       timeout: 15000 // 15 second timeout
@@ -117,7 +117,7 @@ export async function getAuthToken(): Promise<string | null> {
 
 async function refreshAccessToken(refreshToken: string): Promise<string> {
   try {
-    const response = await axios.post(`${API_BASE_URL}/api/v1/auth/github/refresh`, {
+    const response = await axios.post(`${API_BASE_URL}/api/cli/refresh`, {
       refresh_token: refreshToken
     }, {
       timeout: 10000

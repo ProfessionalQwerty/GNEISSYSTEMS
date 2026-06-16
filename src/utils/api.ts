@@ -2,7 +2,7 @@ import axios from 'axios';
 import { DependencyGraph } from './graphBuilder';
 import { getAuthToken } from './auth';
 
-const API_BASE_URL = process.env.GNEISS_API_URL || 'https://gneiss-platform.vercel.app';
+const API_BASE_URL = process.env.GNEISS_API_URL || 'https://gneiss-systems.vercel.app';
 const MAX_RETRIES = 3;
 const INITIAL_RETRY_DELAY = 1000; // 1 second
 
