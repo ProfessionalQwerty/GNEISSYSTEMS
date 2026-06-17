@@ -5,19 +5,72 @@ import { scanDirectory } from '../utils/scanner';
 import { buildDependencyGraph } from '../utils/graphBuilder';
 import { sendAnalysisRequest } from '../utils/api';
 import { renderMarkdown } from '../utils/markdown';
+import { getAuthToken } from '../utils/auth';
+import axios from 'axios';
+
+const API_BASE_URL = process.env.GNEISS_API_URL || 'https://gneiss-systems.vercel.app';
+
+async function logScanMetrics(
+  accessToken: string,
+  scanType: string,
+  status: string,
+  systemMetadata: any = {},
+  errorMessage: string | null = null,
+  scanDurationMs: number | null = null,
+  filesScanned: number | null = null
+) {
+  try {
+    await axios.post(`${API_BASE_URL}/api/v1/metrics/log`, {
+      access_token: accessToken,
+      scan_type: scanType,
+      status,
+      system_metadata: systemMetadata,
+      error_message: errorMessage,
+      scan_duration_ms: scanDurationMs,
+      files_scanned: filesScanned
+    }, {
+      timeout: 5000
+    });
+  } catch (error) {
+    // Don't fail the scan if metrics logging fails
+    console.warn(chalk.yellow('⚠️  Failed to log scan metrics'));
+  }
+}
 
 export const auditCommand = new Command('audit')
   .description('Analyze a local Java directory for structural coupling')
   .argument('<directory>', 'Path to the Java directory to analyze')
   .option('-d, --depth <number>', 'Depth of analysis', '10')
   .action(async (directory: string, options: { depth: string }) => {
+    const startTime = Date.now();
+    let accessToken: string | null = null;
+    let scanStatus = 'initiated';
+    let errorMessage: string | null = null;
+    let filesScanned: number | null = null;
+
     try {
       console.log(chalk.cyan.bold('\n🔍 GNEISS Structural Analysis\n'));
+
+      // Get auth token for metrics logging
+      accessToken = await getAuthToken();
+
+      // Log scan initiation
+      if (accessToken) {
+        await logScanMetrics(accessToken, 'audit', 'initiated', {
+          directory,
+          depth: options.depth
+        });
+      }
 
       // Validate depth parameter
       const depth = parseInt(options.depth, 10);
       if (isNaN(depth) || depth < 1 || depth > 100) {
         console.error(chalk.red.bold('\n❌ Error:'), 'Depth must be a number between 1 and 100');
+        scanStatus = 'failed';
+        errorMessage = 'Invalid depth parameter';
+        if (accessToken) {
+          await logScanMetrics(accessToken, 'audit', scanStatus, {}, errorMessage, Date.now() - startTime, 0);
+        }
         process.exit(1);
       }
 
@@ -27,9 +80,15 @@ export const auditCommand = new Command('audit')
       try {
         javaFiles = await scanDirectory(directory);
         spinner.succeed(`Found ${javaFiles.length} Java files`);
+        filesScanned = javaFiles.length;
       } catch (scanError: any) {
         spinner.fail('Directory scan failed');
         console.error(chalk.red.bold('\n❌ Error:'), scanError.message);
+        scanStatus = 'failed';
+        errorMessage = scanError.message;
+        if (accessToken) {
+          await logScanMetrics(accessToken, 'audit', scanStatus, {}, errorMessage, Date.now() - startTime, 0);
+        }
         process.exit(1);
       }
 
@@ -37,6 +96,14 @@ export const auditCommand = new Command('audit')
         spinner.stop();
         console.log(chalk.yellow('\n⚠️  No Java files found in the specified directory.'));
         console.log(chalk.white('Please ensure the directory contains Java source files (.java) and try again.'));
+        scanStatus = 'completed';
+        if (accessToken) {
+          await logScanMetrics(accessToken, 'audit', scanStatus, {
+            directory,
+            depth: options.depth,
+            files_found: 0
+          }, null, Date.now() - startTime, 0);
+        }
         return;
       }
 
@@ -49,6 +116,11 @@ export const auditCommand = new Command('audit')
       } catch (graphError: any) {
         spinner.fail('Dependency graph construction failed');
         console.error(chalk.red.bold('\n❌ Error:'), graphError.message);
+        scanStatus = 'failed';
+        errorMessage = graphError.message;
+        if (accessToken) {
+          await logScanMetrics(accessToken, 'audit', scanStatus, {}, errorMessage, Date.now() - startTime, filesScanned);
+        }
         process.exit(1);
       }
 
@@ -56,6 +128,11 @@ export const auditCommand = new Command('audit')
       if (!dependencyGraph.nodes || dependencyGraph.nodes.length === 0) {
         spinner.stop();
         console.error(chalk.red.bold('\n❌ Error:'), 'No dependency nodes found. Cannot analyze empty graph.');
+        scanStatus = 'failed';
+        errorMessage = 'No dependency nodes found';
+        if (accessToken) {
+          await logScanMetrics(accessToken, 'audit', scanStatus, {}, errorMessage, Date.now() - startTime, filesScanned);
+        }
         process.exit(1);
       }
 
@@ -70,6 +147,11 @@ export const auditCommand = new Command('audit')
       } catch (apiError: any) {
         spinner.fail('Analysis failed');
         console.error(chalk.red.bold('\n❌ Error:'), apiError.message);
+        scanStatus = 'failed';
+        errorMessage = apiError.message;
+        if (accessToken) {
+          await logScanMetrics(accessToken, 'audit', scanStatus, {}, errorMessage, Date.now() - startTime, filesScanned);
+        }
         process.exit(1);
       }
 
@@ -86,8 +168,27 @@ export const auditCommand = new Command('audit')
       console.log(chalk.white(`PageRank Entropy: ${result.metrics.pagerank_entropy.toFixed(4)}`));
       console.log(chalk.white(`Structural Delta: ${result.metrics.structural_delta.toFixed(4)}`));
 
+      // Log successful scan completion
+      scanStatus = 'completed';
+      if (accessToken) {
+        await logScanMetrics(accessToken, 'audit', scanStatus, {
+          directory,
+          depth: options.depth,
+          risk_level: result.risk_level,
+          decay_probability: result.decay_probability,
+          spectral_gap_ratio: result.metrics.spectral_gap_ratio,
+          pagerank_entropy: result.metrics.pagerank_entropy,
+          structural_delta: result.metrics.structural_delta
+        }, null, Date.now() - startTime, filesScanned);
+      }
+
     } catch (error: any) {
       console.error(chalk.red.bold('\n❌ Unexpected Error:'), error.message);
+      scanStatus = 'failed';
+      errorMessage = error.message;
+      if (accessToken) {
+        await logScanMetrics(accessToken, 'audit', scanStatus, {}, errorMessage, Date.now() - startTime, filesScanned);
+      }
       process.exit(1);
     }
   });

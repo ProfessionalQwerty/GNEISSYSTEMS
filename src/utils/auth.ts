@@ -8,11 +8,14 @@ const TOKEN_FILE = path.join(os.homedir(), '.gneiss', 'auth.json');
 const API_BASE_URL = process.env.GNEISS_API_URL || 'https://gneiss-systems.vercel.app';
 const ENCRYPTION_KEY = process.env.GNEISS_ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
 
-interface AuthData {
+export interface AuthData {
   accessToken: string;
   refreshToken?: string;
   expiresAt?: number;
   encrypted: boolean;
+  userId?: string;
+  username?: string;
+  email?: string;
 }
 
 export async function initiateGitHubAuth(): Promise<string> {
@@ -141,7 +144,7 @@ async function refreshAccessToken(refreshToken: string): Promise<string> {
   }
 }
 
-async function saveAuthData(authData: AuthData): Promise<void> {
+export async function saveAuthData(authData: AuthData): Promise<void> {
   const authDir = path.dirname(TOKEN_FILE);
   
   if (!fs.existsSync(authDir)) {
@@ -188,7 +191,7 @@ function decryptData(encryptedData: string): string {
   }
 }
 
-function loadAuthData(): AuthData | null {
+export function loadAuthData(): AuthData | null {
   try {
     if (!fs.existsSync(TOKEN_FILE)) {
       return null;
