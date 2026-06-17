@@ -32,7 +32,7 @@ if (-not $latestRelease) {
 Write-Host "📥 Downloading GNEISS CLI $latestRelease for $os-$arch..." -ForegroundColor Cyan
 
 # Download binary - CLI folder is uploaded directly to main branch
-$downloadUrl = "https://github.com/ProfessionalQwerty/GNEISSYSTEMS/releases/download/$latestRelease/gneiss.exe"
+$downloadUrl = "https://github.com/ProfessionalQwerty/GNEISSYSTEMS/releases/download/$latestRelease/gneiss-windows-amd64.exe"
 
 # Create temp directory
 $tempDir = Join-Path $env:TEMP "gneiss-install"
@@ -54,7 +54,7 @@ if (-not (Test-Path $installDir)) {
 }
 
 Write-Host "🔨 Installing to $installDir..." -ForegroundColor Cyan
-Move-Item -Path "gneiss.exe" -Destination "$installDir\gneiss.exe" -Force
+Move-Item -Path "gneiss-windows-amd64.exe" -Destination "$installDir\gneiss.exe" -Force
 
 # Add to PATH if not already there
 $pathEnv = [Environment]::GetEnvironmentVariable("Path", "User")

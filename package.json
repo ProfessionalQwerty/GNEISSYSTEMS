@@ -10,7 +10,7 @@
     "build": "tsc",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js",
-    "pkg": "pkg dist/index.js --targets node18-win-x64 --output gneiss.exe"
+    "pkg": "pkg dist/index.js --targets node18-win-x64 --output gneiss-windows-amd64.exe"
   },
   "keywords": [
     "structural-analysis",

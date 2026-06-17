@@ -46,17 +46,17 @@ fi
 echo "� Downloading GNEISS CLI $LATEST_RELEASE for $OS-$ARCH..."
 
 # Download binary - CLI folder is uploaded directly to main branch
-DOWNLOAD_URL="https://github.com/ProfessionalQwerty/GNEISSYSTEMS/releases/download/${LATEST_RELEASE}/gneiss"
+DOWNLOAD_URL="https://github.com/ProfessionalQwerty/GNEISSYSTEMS/releases/download/${LATEST_RELEASE}/gneiss-linux-amd64"
 
 # Create temp directory
 TEMP_DIR=$(mktemp -d)
 cd "$TEMP_DIR"
 
 # Download
-curl -fsSL "$DOWNLOAD_URL" -o gneiss
+curl -fsSL "$DOWNLOAD_URL" -o gneiss-linux-amd64
 
 # Make executable
-chmod +x gneiss
+chmod +x gneiss-linux-amd64
 
 # Install to /usr/local/bin
 INSTALL_DIR="/usr/local/bin"
@@ -66,7 +66,7 @@ if [ ! -d "$INSTALL_DIR" ]; then
 fi
 
 echo "� Installing to $INSTALL_DIR..."
-sudo mv gneiss "$INSTALL_DIR/gneiss" 2>/dev/null || mv gneiss "$INSTALL_DIR/gneiss"
+sudo mv gneiss-linux-amd64 "$INSTALL_DIR/gneiss" 2>/dev/null || mv gneiss-linux-amd64 "$INSTALL_DIR/gneiss"
 
 # Cleanup
 cd -
