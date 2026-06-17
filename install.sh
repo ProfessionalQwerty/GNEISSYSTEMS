@@ -45,9 +45,8 @@ fi
 
 echo "� Downloading GNEISS CLI $LATEST_RELEASE for $OS-$ARCH..."
 
-# Download binary
-BINARY_NAME="gneiss-${OS}-${ARCH}"
-DOWNLOAD_URL="https://github.com/ProfessionalQwerty/GNEISSYSTEMS/releases/download/${LATEST_RELEASE}/${BINARY_NAME}"
+# Download binary - CLI folder is uploaded directly to main branch
+DOWNLOAD_URL="https://github.com/ProfessionalQwerty/GNEISSYSTEMS/releases/download/${LATEST_RELEASE}/gneiss"
 
 # Create temp directory
 TEMP_DIR=$(mktemp -d)

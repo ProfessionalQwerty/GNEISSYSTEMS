@@ -31,9 +31,8 @@ if (-not $latestRelease) {
 
 Write-Host "📥 Downloading GNEISS CLI $latestRelease for $os-$arch..." -ForegroundColor Cyan
 
-# Download binary
-$binaryName = "gneiss-$os-$arch.exe"
-$downloadUrl = "https://github.com/ProfessionalQwerty/GNEISSYSTEMS/releases/download/$latestRelease/$binaryName"
+# Download binary - CLI folder is uploaded directly to main branch
+$downloadUrl = "https://github.com/ProfessionalQwerty/GNEISSYSTEMS/releases/download/$latestRelease/gneiss.exe"
 
 # Create temp directory
 $tempDir = Join-Path $env:TEMP "gneiss-install"

@@ -17,7 +17,7 @@ interface AuthData {
 
 export async function initiateGitHubAuth(): Promise<string> {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/cli/auth`, {
+    const response = await axios.get(`${API_BASE_URL}/api/v1/auth/github/cli`, {
       timeout: 10000 // 10 second timeout
     });
     
@@ -45,7 +45,7 @@ export async function exchangeCodeForToken(code: string): Promise<string> {
   }
 
   try {
-    const response = await axios.post(`${API_BASE_URL}/api/cli/exchange`, {
+    const response = await axios.post(`${API_BASE_URL}/api/v1/auth/github/exchange`, {
       code: code.trim()
     }, {
       timeout: 15000 // 15 second timeout
@@ -117,7 +117,7 @@ export async function getAuthToken(): Promise<string | null> {
 
 async function refreshAccessToken(refreshToken: string): Promise<string> {
   try {
-    const response = await axios.post(`${API_BASE_URL}/api/cli/refresh`, {
+    const response = await axios.post(`${API_BASE_URL}/api/v1/auth/github/refresh`, {
       refresh_token: refreshToken
     }, {
       timeout: 10000
