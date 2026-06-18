@@ -266,12 +266,7 @@ export const auditCommand = new Command("audit")
       const decayProbabilityPercent = probabilityToPercent(
         result.decay_probability,
       );
-      const codebaseHealthScore = clampPercent(
-        Number(
-          result.metrics?.codebase_health_score ??
-            100 - decayProbabilityPercent,
-        ),
-      );
+      const codebaseHealthScore = clampPercent(100 - decayProbabilityPercent);
 
       console.log(chalk.cyan.bold("\n📈 Metrics\n"));
       console.log(
