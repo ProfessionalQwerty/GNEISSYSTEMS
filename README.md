@@ -8,11 +8,7 @@ dependencies, tight coupling, architectural rot — before it becomes
 a rewrite.
 
 
-
-<img width="800" height="272" alt="repos_cache-VisualStudioCode2026-06-1809-37-00-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/8a0e52d4-bfd8-4ba3-b5a2-fcf2dfe936dc" />
-
-
-
+<img width="1814" height="618" alt="Adobe Express - repos_cache-VisualStudioCode2026-06-1809-37-00-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/c88814ec-ab71-411e-9787-298624972224" />
 
 
 ## Installation
