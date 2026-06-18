@@ -1,6 +1,6 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
+import * as fs from "fs";
+import * as path from "path";
+import * as os from "os";
 
 export interface JavaFile {
   path: string;
@@ -11,8 +11,18 @@ export interface JavaFile {
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_DEPTH = 50; // Maximum directory depth to prevent infinite loops
 const SKIPPED_DIRECTORIES = new Set([
-  'node_modules', '.git', 'target', 'build', 'dist', '.next',
-  'vendor', 'coverage', '.idea', '.vscode', 'venv', 'env'
+  "node_modules",
+  ".git",
+  "target",
+  "build",
+  "dist",
+  ".next",
+  "vendor",
+  "coverage",
+  ".idea",
+  ".vscode",
+  "venv",
+  "env",
 ]);
 
 export async function scanDirectory(directory: string): Promise<JavaFile[]> {
@@ -23,7 +33,9 @@ export async function scanDirectory(directory: string): Promise<JavaFile[]> {
       throw new Error(`Path is not a directory: ${directory}`);
     }
   } catch (error) {
-    throw new Error(`Cannot access directory: ${directory}. Please check the path and permissions.`);
+    throw new Error(
+      `Cannot access directory: ${directory}. Please check the path and permissions.`,
+    );
   }
 
   const javaFiles: JavaFile[] = [];
@@ -54,25 +66,30 @@ export async function scanDirectory(directory: string): Promise<JavaFile[]> {
             if (!SKIPPED_DIRECTORIES.has(entry.name)) {
               await scan(fullPath, depth + 1);
             }
-          } else if (entry.name.endsWith('.java')) {
+          } else if (entry.name.endsWith(".java")) {
             // Check file size before reading
             const fileStats = await fs.promises.stat(fullPath);
             if (fileStats.size > MAX_FILE_SIZE) {
-              console.warn(`Skipping large file: ${fullPath} (${(fileStats.size / 1024 / 1024).toFixed(2)}MB)`);
+              console.warn(
+                `Skipping large file: ${fullPath} (${(fileStats.size / 1024 / 1024).toFixed(2)}MB)`,
+              );
               continue;
             }
 
-            const content = await fs.promises.readFile(fullPath, 'utf-8');
+            const content = await fs.promises.readFile(fullPath, "utf-8");
             const imports = extractImports(content);
             const packageName = extractPackageName(content);
 
-            // Use relative path from the base directory for anonymization
-            const relativePath = path.relative(directory, fullPath);
+            // Use a stable POSIX-style relative path so graph node IDs are
+            // identical on Windows, macOS, and Linux.
+            const relativePath = path
+              .relative(directory, fullPath)
+              .replace(/\\/g, "/");
 
             javaFiles.push({
               path: relativePath,
               imports,
-              packageName
+              packageName,
             });
           }
         } catch (fileError) {
@@ -91,7 +108,7 @@ export async function scanDirectory(directory: string): Promise<JavaFile[]> {
 
 function extractImports(content: string): string[] {
   try {
-    const importRegex = /import\s+(?:static\s+)?([\w.]+);/g;
+    const importRegex = /import\s+(?:static\s+)?([\w.*]+);/g;
     const imports: string[] = [];
     let match;
 
@@ -110,9 +127,9 @@ function extractPackageName(content: string): string {
   try {
     const packageRegex = /package\s+([\w.]+);/;
     const match = content.match(packageRegex);
-    return match ? match[1] : '';
+    return match ? match[1] : "";
   } catch (error) {
     // If regex fails, return empty string
-    return '';
+    return "";
   }
 }
