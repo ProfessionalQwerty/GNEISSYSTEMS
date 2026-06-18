@@ -3,7 +3,7 @@ import { JavaFile } from "./scanner";
 
 export interface DependencyGraph {
   nodes: Array<{ id: string; label: string; group?: string }>;
-  links: Array<{ source: string; target: string; weight?: number }>;
+  links: Array<{ source: string; target: string; weight?: number; line?: number; statement?: string }>;
 }
 
 function normalizePathSeparators(filePath: string): string {
@@ -49,13 +49,13 @@ function getPackageName(nodeId: string): string {
 }
 
 function addLink(
-  links: Map<string, { source: string; target: string; weight: number }>,
+  links: Map<string, { source: string; target: string; weight: number; line?: number; statement?: string }>,
   source: string,
   target: string,
+  line?: number,
+  statement?: string,
 ): void {
-  if (!source || !target || source === target) {
-    return;
-  }
+  if (!source || !target || source === target) return;
 
   const linkKey = `${source}\u0000${target}`;
   const existingLink = links.get(linkKey);
@@ -63,7 +63,7 @@ function addLink(
   if (existingLink) {
     existingLink.weight += 1;
   } else {
-    links.set(linkKey, { source, target, weight: 1 });
+    links.set(linkKey, { source, target, weight: 1, line, statement });
   }
 }
 
@@ -108,9 +108,9 @@ export function buildDependencyGraph(javaFiles: JavaFile[]): DependencyGraph {
     string,
     { id: string; label: string; group?: string }
   >();
-  const links = new Map<
+  const links = new Map
     string,
-    { source: string; target: string; weight: number }
+    { source: string; target: string; weight: number; line?: number; statement?: string }
   >();
   const sourceIds = new Map<JavaFile, string>();
   const simpleNameIndex = new Map<string, string[]>();
@@ -133,18 +133,16 @@ export function buildDependencyGraph(javaFiles: JavaFile[]): DependencyGraph {
 
   for (const file of javaFiles) {
     const sourceNodeId = sourceIds.get(file);
+    if (!sourceNodeId) continue;
 
-    if (!sourceNodeId) {
-      continue;
-    }
+    for (const imp   of file.imports) {
+      // imp needs to be an object now — see scanner change below
+      const importName = typeof imp === "string" ? imp : imp.name;
+      const line = typeof imp === "string" ? undefined : imp.line;
+      const statement = typeof imp === "string" ? undefined : imp.statement;
 
-    for (const imp of file.imports) {
-      for (const targetNodeId of resolveImportTargets(
-        imp,
-        nodes,
-        simpleNameIndex,
-      )) {
-        addLink(links, sourceNodeId, targetNodeId);
+      for (const targetNodeId of resolveImportTargets(importName, nodes, simpleNameIndex)) {
+        addLink(links, sourceNodeId, targetNodeId, line, statement);
       }
     }
   }

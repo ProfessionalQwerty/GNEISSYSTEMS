@@ -4,7 +4,7 @@ import * as os from "os";
 
 export interface JavaFile {
   path: string;
-  imports: string[];
+  imports: Array<{ name: string; line: number; statement: string }>;
   packageName: string;
 }
 
@@ -125,19 +125,28 @@ function normalizeJavaQualifiedName(value: string): string {
   return value.replace(/\s+/g, "");
 }
 
-function extractImports(content: string): string[] {
+function extractImports(content: string): Array<{ name: string; line: number; statement: string }> {
   try {
     const source = stripJavaComments(content);
-    const imports: string[] = [];
-    let match;
+    const imports: Array<{ name: string; line: number; statement: string }> = [];
+    const lines = source.split("\n");
 
-    while ((match = JAVA_IMPORT_REGEX.exec(source)) !== null) {
-      imports.push(normalizeJavaQualifiedName(match[1]));
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const match = line.match(
+        /^\s*import\s+(?:static\s+)?([A-Za-z_$][\w$]*(?:\s*\.\s*[A-Za-z_$][\w$]*)*(?:\s*\.\s*\*)?)\s*;/
+      );
+      if (match) {
+        imports.push({
+          name: normalizeJavaQualifiedName(match[1]),
+          line: i + 1,
+          statement: line.trim(),
+        });
+      }
     }
 
     return imports;
   } catch (error) {
-    // If regex fails, return empty array
     return [];
   }
 }
