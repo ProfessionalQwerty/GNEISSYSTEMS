@@ -13,7 +13,7 @@ function normalizePathSeparators(filePath: string): string {
 function stripJavaSourceRoot(filePath: string): string {
   const normalized = normalizePathSeparators(filePath);
   const sourceRootPattern =
-    /(?:^|\/)src\/(?:main|test)\/(?:java|kotlin|scala)\//;
+    /(?:^|\/)src\/(?:(?:main|test)\/(?:java|kotlin|scala)|java|test|samples|blocks)\//;
   const match = normalized.match(sourceRootPattern);
 
   if (!match || match.index === undefined) {
@@ -41,6 +41,11 @@ function normalizeFilePath(file: JavaFile): string {
 
 function normalizeImport(importName: string): string {
   return importName.trim().replace(/\s+/g, "");
+}
+
+function getPackageName(nodeId: string): string {
+  const lastDot = nodeId.lastIndexOf(".");
+  return lastDot >= 0 ? nodeId.slice(0, lastDot) : "";
 }
 
 function addLink(
@@ -75,8 +80,8 @@ function resolveImportTargets(
 
   if (normalizedImport.endsWith(".*")) {
     const packagePrefix = normalizedImport.slice(0, -2);
-    return Array.from(nodes.keys()).filter((nodeId) =>
-      nodeId.startsWith(`${packagePrefix}.`),
+    return Array.from(nodes.keys()).filter(
+      (nodeId) => getPackageName(nodeId) === packagePrefix,
     );
   }
 
@@ -113,7 +118,7 @@ export function buildDependencyGraph(javaFiles: JavaFile[]): DependencyGraph {
   for (const file of javaFiles) {
     const nodeId = normalizeFilePath(file);
     const label = nodeId.split(".").pop() || nodeId;
-    const packageParts = (file.packageName || nodeId)
+    const packageParts = (file.packageName || getPackageName(nodeId) || nodeId)
       .split(".")
       .filter(Boolean);
     const group = packageParts.length > 0 ? packageParts[0] : "default";

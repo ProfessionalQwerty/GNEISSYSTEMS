@@ -11,8 +11,18 @@ import axios from "axios";
 const API_BASE_URL =
   process.env.GNEISS_API_URL || "https://gneiss-systems.vercel.app";
 
+function clampPercent(value: number): number {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(100, value));
+}
+
 function probabilityToPercent(value: number): number {
-  return value <= 1 ? value * 100 : value;
+  const numericValue = Number(value);
+  const percent = numericValue <= 1 ? numericValue * 100 : numericValue;
+  return clampPercent(percent);
 }
 
 function colorRiskLevel(riskLevel: string): string {
@@ -256,9 +266,11 @@ export const auditCommand = new Command("audit")
       const decayProbabilityPercent = probabilityToPercent(
         result.decay_probability,
       );
-      const codebaseHealthScore = Math.max(
-        0,
-        Math.min(100, 100 - decayProbabilityPercent),
+      const codebaseHealthScore = clampPercent(
+        Number(
+          result.metrics?.codebase_health_score ??
+            100 - decayProbabilityPercent,
+        ),
       );
 
       console.log(chalk.cyan.bold("\n📈 Metrics\n"));

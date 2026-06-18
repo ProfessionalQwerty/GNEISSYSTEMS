@@ -106,14 +106,33 @@ export async function scanDirectory(directory: string): Promise<JavaFile[]> {
   return javaFiles;
 }
 
+const JAVA_IDENTIFIER = String.raw`[A-Za-z_$][\w$]*`;
+const JAVA_QUALIFIED_NAME = String.raw`${JAVA_IDENTIFIER}(?:\s*\.\s*${JAVA_IDENTIFIER})*`;
+const JAVA_PACKAGE_REGEX = new RegExp(
+  String.raw`^\s*package\s+(${JAVA_QUALIFIED_NAME})\s*;`,
+  "m",
+);
+const JAVA_IMPORT_REGEX = new RegExp(
+  String.raw`^\s*import\s+(?:static\s+)?(${JAVA_QUALIFIED_NAME}(?:\s*\.\s*\*)?)\s*;`,
+  "gm",
+);
+
+function stripJavaComments(content: string): string {
+  return content.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+}
+
+function normalizeJavaQualifiedName(value: string): string {
+  return value.replace(/\s+/g, "");
+}
+
 function extractImports(content: string): string[] {
   try {
-    const importRegex = /import\s+(?:static\s+)?([\w.*]+);/g;
+    const source = stripJavaComments(content);
     const imports: string[] = [];
     let match;
 
-    while ((match = importRegex.exec(content)) !== null) {
-      imports.push(match[1]);
+    while ((match = JAVA_IMPORT_REGEX.exec(source)) !== null) {
+      imports.push(normalizeJavaQualifiedName(match[1]));
     }
 
     return imports;
@@ -125,9 +144,9 @@ function extractImports(content: string): string[] {
 
 function extractPackageName(content: string): string {
   try {
-    const packageRegex = /package\s+([\w.]+);/;
-    const match = content.match(packageRegex);
-    return match ? match[1] : "";
+    const source = stripJavaComments(content);
+    const match = source.match(JAVA_PACKAGE_REGEX);
+    return match ? normalizeJavaQualifiedName(match[1]) : "";
   } catch (error) {
     // If regex fails, return empty string
     return "";
