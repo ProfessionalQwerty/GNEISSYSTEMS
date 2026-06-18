@@ -1,52 +1,31 @@
-# GNEISS CLI
+# GNEISS
 
-Local structural analysis tool for Java projects.
+Linters catch syntax. Nothing catches architecture. GNEISS does.
+
+A CLI tool that parses Java imports into a dependency graph and runs a 
+GNN-FiLM pipeline over it to surface structural decay — cyclic 
+dependencies, tight coupling, architectural rot — before it becomes 
+a rewrite.
+
+
+
+https://github.com/user-attachments/assets/e5c6a0b3-79e3-4f21-82e0-1b1d1ad6e37a
+
+
+
 
 ## Installation
 
-```bash
-# Run this for Windows
+# Windows
 irm https://raw.githubusercontent.com/ProfessionalQwerty/GNEISSYSTEMS/main/install.ps1 | iex
 
-# Run this for Mac
+# Mac
 curl -fsSL https://raw.githubusercontent.com/ProfessionalQwerty/GNEISSYSTEMS/main/install.sh | bash
-```
 
 ## Usage
 
-### Authentication
-
-First, authenticate with your GitHub account:
-
-```bash
-gneiss auth
-```
-
-This will open a browser window where you can authorize GNEISS to access your GitHub account.
-
-### Analyze a Project
-
-Analyze a local Java directory:
-
-```bash
-gneiss audit ./src
-```
-
-With custom depth:
-
-```bash
-gneiss audit ./src --depth 20
-```
-
-## Features
-
-- **Local Scanning**: Scans local Java files for import statements
-- **Dependency Graph**: Builds anonymized dependency graphs from imports
-- **Secure**: No API keys stored in the CLI; uses GitHub OAuth
-- **Rate Limited**: Respects rate limits per account
-- **Beautiful Output**: Streams markdown results directly to terminal
-
+gneiss auth        # authenticate via GitHub
+gneiss audit ./src # scan a Java project
 
 ## License
-
 MIT
