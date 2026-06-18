@@ -24,4 +24,6 @@ gneiss auth        # authenticate via GitHub
 gneiss audit ./src # scan a Java project
 
 ## License
+
 MIT
+>>>>>>> b1cb45a1980fdf5cd8464c16dc12b9cafac4cc05
