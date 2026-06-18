@@ -1,77 +1,27 @@
-# GNEISS CLI
+# GNEISS
 
-Local structural analysis tool for Java projects.
+Linters catch syntax. Nothing catches architecture. GNEISS does.
+
+A CLI tool that parses Java imports into a dependency graph and runs a 
+GNN-FiLM pipeline over it to surface structural decay — cyclic 
+dependencies, tight coupling, architectural rot — before it becomes 
+a rewrite.
+
+<img width="2560" height="1368" alt="Adobe Express - Adobe Express - testdummy - Visual Studio Code 2026-06-18 21-09-15 (1)" src="https://github.com/user-attachments/assets/77b4f3c4-d580-4e49-bd97-b675ad98b1b3" />
+
 
 ## Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/gneiss-cli.git
-cd gneiss-cli
+# Windows
+irm https://raw.githubusercontent.com/ProfessionalQwerty/GNEISSYSTEMS/main/install.ps1 | iex
 
-# Install dependencies
-npm install
-
-# Build the CLI
-npm run build
-
-# Install globally (optional)
-npm link
-```
+# Mac
+curl -fsSL https://raw.githubusercontent.com/ProfessionalQwerty/GNEISSYSTEMS/main/install.sh | bash
 
 ## Usage
 
-### Authentication
-
-First, authenticate with your GitHub account:
-
-```bash
-gneiss auth
-```
-
-This will open a browser window where you can authorize GNEISS to access your GitHub account.
-
-### Analyze a Project
-
-Analyze a local Java directory:
-
-```bash
-gneiss audit ./src
-```
-
-With custom depth:
-
-```bash
-gneiss audit ./src --depth 20
-```
-
-## Features
-
-- **Local Scanning**: Scans local Java files for import statements
-- **Dependency Graph**: Builds anonymized dependency graphs from imports
-- **Secure**: No API keys stored in the CLI; uses GitHub OAuth
-- **Rate Limited**: Respects rate limits per account
-- **Beautiful Output**: Streams markdown results directly to terminal
-
-## Configuration
-
-The CLI uses the following environment variables:
-
-- `GNEISS_API_URL`: Backend API URL (default: https://gneiss-platform.vercel.app)
-
-## Development
-
-```bash
-# Run in development mode
-npm run dev
-
-# Build for production
-npm run build
-
-# Run tests
-npm test
-```
+gneiss auth        # authenticate via GitHub
+gneiss audit ./src # scan a Java project
 
 ## License
-
 MIT
