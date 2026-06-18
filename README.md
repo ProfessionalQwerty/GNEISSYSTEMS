@@ -7,7 +7,8 @@ GNN-FiLM pipeline over it to surface structural decay — cyclic
 dependencies, tight coupling, architectural rot — before it becomes 
 a rewrite.
 
-<img width="1814" height="618" alt="Adobe Express - repos_cache-VisualStudioCode2026-06-1809-37-00-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/e59cff07-c1aa-476e-a685-63828aef93d3" />
+<img width="2560" height="1368" alt="Adobe Express - Adobe Express - testdummy - Visual Studio Code 2026-06-18 21-09-15 (1)" src="https://github.com/user-attachments/assets/77b4f3c4-d580-4e49-bd97-b675ad98b1b3" />
+
 
 ## Installation
 
